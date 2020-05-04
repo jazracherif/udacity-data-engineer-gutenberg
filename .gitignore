@@ -1,0 +1,10 @@
+.DS_Store
+
+venv/
+
+out/
+data/
+dependencies/
+cache/
+
+*.tar

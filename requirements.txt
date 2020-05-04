@@ -1,0 +1,9 @@
+parquet
+rdflib
+pandas
+tqdm
+boto3
+configparser
+syllables
+pyarrow
+requests
