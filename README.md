@@ -1,4 +1,18 @@
+[components]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/components.png
 
+# Udacity Data Engineer Capstone: Gutenber books ETL
+
+Originally developed to evaluate the difficulty of techincal reading material for the navy, the [Flesch–Kincaid readability tests](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests) have since been used widely on all sorts of text, including books. One of their main use in education circles is to enable teachers to find and recommend books based on their difficulty, as measured by these scores.
+
+In this project, I create an ETL pipeline that compute such socres on all english book in the [Gutenberg](www.gutenberg.org) archive. The ETL to grab the raw data is implemented over Airflow and integrates with AWS EMR to run the calculations. With this approach, Over 25k books (\~8GB) of text can be ingested.
+
+For every text, the number of sentences, words, and syllables are counted up in order to compute the two final scores:
+- [Flesch–Kincaid grade level](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch–Kincaid_grade_level) 
+- Flesch reading ease(https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch_reading_ease)
+
+The ETL architecture as implemented in the project consists of extract raw data from the gutenberg site itself, processing it into basic catalog information and textual file and uploading them into S3, then creating a Spark EMR cluster and running a Spark Application to compute the scores, which are then written back into S3 in parquet format, and ingested by Glue/Athena for analysis.
+
+![Architectural Components][components]
 
 
 ## Catalog Data
@@ -49,5 +63,5 @@ zip -r ../dependencies.zip .
 
 Run the spark jobs with the following command:
 
-`spark-submit --py-files dependencies.zip etl.py --mode emr`
+`spark-submit --py-files dependencies.zip spark-etl.py --mode emr`
 

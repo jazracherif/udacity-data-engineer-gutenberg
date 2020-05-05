@@ -3,8 +3,17 @@
 venv/
 
 out/
-data/
-dependencies/
+data*/
+spark-dependencies/
 cache/
 
 *.tar
+*.key
+*.pyc
+*.pid
+
+spark-dependencies.zip
+
+__pycache__/
+airflow/logs/
+airflow/airflow.db

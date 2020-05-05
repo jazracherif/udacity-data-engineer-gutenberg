@@ -7,3 +7,5 @@ configparser
 syllables
 pyarrow
 requests
+apache-airflow
+cryptography
