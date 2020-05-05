@@ -28,7 +28,7 @@ default_args = {
     'depends_on_past':False
 }
 
-dag = DAG('gutenberg-etl-v4',
+dag = DAG('gutenberg-etl',
           default_args=default_args,
           description='Load Gutenberg catalog data into AWS S3 and process with EMR',
           schedule_interval='@weekly',

@@ -3,6 +3,12 @@
 [crawler]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/glue-crawler.png
 [athena]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/athena-tables.png
 [athena-query]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/athena-query.png
+[ganglia-cpu]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/ganglia-cpu.png
+[ganglia-mem]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/ganglia-mem.png
+[spark-sql-full]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/spark-sql-full.png
+[gantt]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/gantt.png
+[aws-emr-config]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/aws-emr-config.png
+[aws-s3-buckets]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/aws-s3-buckets.png
 
 # Udacity Data Engineer Capstone: Gutenber books ETL
 
@@ -113,15 +119,20 @@ The Airflow DAG that performs the ETL is shown below
 
 ![Airflow DAG][dag]
 
-
 This DAG is scheduled to run weekly and will execute the following steps:
 1) Download latest catalog data from gutenberg and new text files
 2) Generate the catalog.csv file and upload it to S3, together with the relevant text files
 3) Create an EMR cluster and run the ETL pipeline as defined in lib/spark-etl.py
 
+See an example of the EMR config use for this project
+
+![aws-emr-config][aws-emr-config]
+
 ## Results
 
 The Spark ETL pipline will generate the tables in the form of Parquet files stored in the S3 bucket {bucket_name}/gutenberg-data/results
+
+![aws-s3-buckets][aws-s3-buckets]
 
 A Glue crawler can then be programmed to extract the table and show them in AWS Athena
 
@@ -132,4 +143,31 @@ A Glue crawler can then be programmed to extract the table and show them in AWS 
 The final resutls can be visualized by a query:
 
 ![athena-query][athena-query]
+
+
+## Performance
+
+Some considerations regarding performance:
+- The generation of the catalog.csv file currently takes time because each file is the RDF format.
+- The initial upload of the texts files to S3 will take time. This is because S3 is optimized for a small number of large files rather than a large number of small files.
+- The computation in Spark 
+
+See for example the GANTT chart for the Airflow Task runtime which showcase where the bulk of the computation happens:
+
+![gantt][[gantt]]
+
+
+Spark:
+- In order to expedite the computations and meet the memory constraints, I used 5 slave workers of EC2 instance type m5.2xlarge, with exeutor memory of 5G. This allows me to have 9 active executors each with 2 cores and able to run 2 tasks. Under this configuration, the Spark Job takes about 20 minutes to complete.
+- I have arrived at this configuration after monitoring the performance and iteratively increasing the memory capacity as well as the number of partitions, as i was running into heap full errors. I used Ganglia to keep track of my machines memory and CPU
+
+Ganglia snapshots:
+
+![ganglia-cpu][ganglia-cpu]
+![ganglia-mem][ganglia-mem]
+
+
+As shown below the Full Spark SQL plan for computing the scores is complex
+
+![spark-sql-full][spark-sql-full]
 

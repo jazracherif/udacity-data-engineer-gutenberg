@@ -59,6 +59,8 @@ def get_title(g, id):
 def get_language(g, id):
     """ Get the language for the selected book ID 
     """
+    language = None
+
     subject = URIRef(f"http://www.gutenberg.org/ebooks/{id}")
 
     language_p =  URIRef("http://purl.org/dc/terms/language")
@@ -72,6 +74,9 @@ def get_language(g, id):
 def get_author_info(g, id):
     """ Get author information for the selected book ID
     """
+    author = None
+    wiki = None
+    
     subject = URIRef(f"http://www.gutenberg.org/ebooks/{id}")
 
     # Get Author
