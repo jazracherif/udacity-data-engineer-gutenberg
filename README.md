@@ -17,19 +17,18 @@ Developed originally to evaluate the reading difficulty of technical material fo
 In this project, I create an ETL pipeline that compute such scores on all english books in the [Gutenberg](www.gutenberg.org) archive. The ETL is orchestrated via [Airflow](https://airflow.apache.org) and invokes AWS EMR to run the calculations in a distributed fashion. 
 
 For every text, the number of sentences, words, and syllables are counted up in order to compute the two final scores:
-- [Flesch–Kincaid grade level](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch–Kincaid_grade_level) 
-- [Flesch reading ease](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch_reading_ease)
+- [Flesch–Kincaid grade level](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch–Kincaid_grade_level).
+- [Flesch reading ease](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch_reading_ease).
 
 The ETL architecture as implemented in the project consists of extracting raw data from the Gutenberg website itself, processing it into catalog information and upload the catalog as well as text files to S3. A Spark EMR cluster is then created and a Spark Application ETL computes the scores, which are then written back into S3 in parquet format, and ingested by Glue/Athena for analysis.
 
 ![Architectural Components][components]
 
-
 ## The data model
 
 The raw dataset consist of:
-1. 60,000 RDF files containing the full description of the [Gutenberg catalog](http://www.gutenberg.org/wiki/Gutenberg:Feeds) in the RDF format
-2. 41GB on disk (345k items) of text files downloaded from the gutenberg website 
+1. 60,000 RDF files containing the full description of the [Gutenberg catalog](http://www.gutenberg.org/wiki/Gutenberg:Feeds) in the RDF format.
+2. 41GB on disk (345k items) of text files downloaded from the gutenberg website.
 
 Out of these files, we generate the following tables in our database:
 
@@ -43,10 +42,9 @@ Out of these files, we generate the following tables in our database:
     reading_difficulty: contains scores and statistics about each book
         id, sentence_count, word_count, syllables_count, grade_level, reading_ease
 
-
 There is a number of challenges identified with the Gutenberg source of data:
-- Duplication of files for the same title, often due to the use of new formats. This can be seen either through the `/old` folder or through copy of files with the `-8.txt` prefix
-- The catalog data is in RDF format and the extraction of data must follow the protocol. This means that not all fields may be present, and we are limited in terms of meta data, or have to join it separetely with a different source (such as wiki data)
+- Duplication of files for the same title, often due to the use of new formats. This can be seen either through the `/old` folder or through copy of files with the `-8.txt` prefix.
+- The catalog data is in RDF format and the extraction of data must follow the protocol. This means that not all fields may be present, and we are limited in terms of meta data, or have to join it separetely with a different source (such as wiki data).
 - The mapping between the catalog data and the text files itself is implicit. The RDF filenames contains the id which is also the name of the book's text file, the later has to be extracted from a nested directory structure.
 - The Gutenberg data itself contains more than literary books but it is not currently possible to download only the books titles.
 - A single book can have multiple volumes and these are separate files and treated as separate books.
@@ -54,24 +52,23 @@ There is a number of challenges identified with the Gutenberg source of data:
 
 
 The following files are relevant
-- `lib/gutenberg.py`: contains code to extract catalog information from the gutenberg website, download teh text files, and upload them to S3
-- `lib\emr.py`: contains all the utilities need to create an EMR cluster, submit a job, and tear down the cluster
-- `lib\spark-etl.py`: contains the Spark Application code for computing the scores
-- `airflow\dags\gutenberg-etl.py`: contains the airflow DAG that orchestrate the whole process
+- `lib/gutenberg.py`: contains code to extract catalog information from the gutenberg website, download teh text files, and upload them to S3.
+- `lib\emr.py`: contains all the utilities need to create an EMR cluster, submit a job, and tear down the cluster.
+- `lib\spark-etl.py`: contains the Spark Application code for computing the scores.
+- `airflow\dags\gutenberg-etl.py`: contains the airflow DAG that orchestrate the whole process.
 
 
 ## Installation
 
 ### Prerequisits
 
-AWS credentials with read/write permissions for S3 and AWS EMR must be available and stored in the `cfg/aws.cfg` file
+AWS credentials with read/write permissions for S3 and AWS EMR must be available and stored in the `cfg/aws.cfg` file.
 
 ### Setup
 
 To install the python virtual environment and dependencies:
 
 `make install`
-
 
 ## Local Spark Development
 
@@ -89,7 +86,7 @@ and download the data:
 
 `python lib/gutenberg.py --cmd download_data`
 
-The above will take up to 30 minutes to complete the first time (40Gb of download), and the data will be store in the `data/` folder
+The above will take up to 30 minutes to complete the first time (40Gb of download), and the data will be store in the `data/` folder.
 
 Generate the catalog file by processing the RDF files:
 
@@ -102,7 +99,6 @@ Finally, to run spark in local mode:
 `make spark`
 
 This will invoke `lib/spark-etl.py` which contains the code to generate the final dataset. Note that for local dev, a smaller catalog will be used `catalog_mini.csv` which consits of 20 book titles.
-
 
 ## Airflow Pipeline
 
@@ -119,7 +115,7 @@ The Airflow DAG that performs the ETL is shown below:
 This DAG is scheduled to run weekly and will execute the following steps:
 1) Download latest catalog data from Gutenberg and new text files.
 2) Generate the catalog.csv file and upload it to S3, together with the relevant text files.
-3) Create an EMR cluster and run the ETL pipeline as defined in lib/spark-etl.py
+3) Create an EMR cluster and run the ETL pipeline as defined in lib/spark-etl.py.
 
 See an example of the EMR config use for this project
 
@@ -129,14 +125,13 @@ to stop the airflow servers:
 
 `airflow-stop.sh`
 
-
 ## Results
 
-The Spark ETL pipline will generate the tables in the form of Parquet files stored in the S3 bucket {bucket_name}/gutenberg-data/results
+The Spark ETL pipline will generate the tables in the form of Parquet files stored in the S3 bucket {bucket_name}/gutenberg-data/results.
 
 ![aws-s3-buckets][aws-s3-buckets]
 
-A Glue crawler can then be programmed to extract the table and show them in AWS Athena
+A Glue crawler can then be programmed to extract the table and show them in AWS Athena:
 
 ![Glue Crawler][crawler]
 
@@ -146,16 +141,15 @@ The final resutls can be visualized by a query:
 
 ![athena-query][athena-query]
 
-
 The Airflow DAG takes about 75min, scans over an 40gb of text, filters down to about ~20k books and ultimetly computes scores for *16k* books in Spark with the following statistics:
-- 50,029,777 sentences were counted
-- 1,095,843,417 words were counted
-- 1,555,430,845 syllables counted
+- 50,029,777 sentences were counted.
+- 1,095,843,417 words were counted.
+- 1,555,430,845 syllables counted.
 
 ## Performance
 
 Some considerations regarding performance:
-- The generation of the catalog.csv file currently takes time because each file is in the RDF format. This could be done in a distributed fashion in RDF
+- The generation of the catalog.csv file currently takes time because each file is in the RDF format. This could be done in a distributed fashion in RDF.
 - The initial upload of the texts files to S3 will take time. This is because S3 is optimized for a small number of large files rather than a large number of small files.
 - The computation of scores in Spark was done via regex for detecting sentences and the [hypenate](https://github.com/jfinkels/hyphenate) module to detect syllabels, which implements the Lian Algorithm as defined in http://www.tug.org/docs/liang/liang-thesis.pdf.
 
@@ -173,8 +167,7 @@ Ganglia snapshots:
 ![ganglia-cpu][ganglia-cpu]
 ![ganglia-mem][ganglia-mem]
 
-
-As shown below the Full Spark SQL plan for computing the scores is complex
+As shown below the Full Spark SQL plan for computing the scores is complex:
 
 ![spark-sql-full][spark-sql-full]
 
