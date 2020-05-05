@@ -161,7 +161,7 @@ Some considerations regarding performance:
 
 See for example the GANTT chart for the Airflow Task runtime which showcase where the bulk of the computation happens (note that in this case, the text files had already been downloaded once):
 
-![gantt][[gantt]]
+![gantt][gantt]
 
 
 Spark:
