@@ -10,7 +10,7 @@
 [aws-emr-config]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/aws-emr-config.png
 [aws-s3-buckets]: https://github.com/jazracherif/udacity-data-engineer-gutenberg/blob/master/docs/aws-s3-buckets.png
 
-# Udacity Data Engineer Capstone: Gutenber books ETL
+# Udacity Data Engineer Capstone Project: ETL to compute readability scores for Gutenber books
 
 Developed originally to evaluate the reading difficulty of technical material for the U.S. Navy, the [Flesch–Kincaid readability tests](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests) have since been used widely on all sorts of text, including the reading levels of books. One of their main use in education circles is to enable teachers to find and recommend books based on their reading difficulty, as measured by these scores.
 
@@ -170,4 +170,6 @@ Ganglia snapshots:
 As shown below the Full Spark SQL plan for computing the scores is complex:
 
 ![spark-sql-full][spark-sql-full]
+
+We can also see the list 
 
