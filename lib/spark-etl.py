@@ -58,19 +58,20 @@ def create_spark_session(mode):
         .config(conf=conf) \
         .getOrCreate()
 
-    spark.sparkContext.addPyFile("/tmp/spark-dependencies.zip")
-
     return spark
 
 
-def process_data(spark, input_data, output_data):
+def process_data(spark, input_data, output_data, mode):
     """ Ingest the Catalog and process all the files included in it,
         computing reading statistics and storing them in parquet files.
 
         Currently handles only english titles.
     """
+    if mode == 'local':
+        catalog_data_url = input_data + "catalog/catalog_mini.csv"
+    else:
+        catalog_data_url = input_data + "catalog/catalog.csv"
 
-    catalog_data_url = input_data + "catalog/catalog.csv"
 
     df = spark.read.csv(catalog_data_url, sep='\t', header=True)
 
@@ -165,17 +166,19 @@ def main():
     args = argparser()
     mode = args.mode
  
+    spark = create_spark_session(mode)
+
     if mode == 'emr':
         input_data = "s3://jazra-gutenberg/gutenberg-data/data/"
         output_data = "s3://jazra-gutenberg/gutenberg-data/results/"
+        spark.sparkContext.addPyFile("/tmp/spark-dependencies.zip")
     elif mode == 'local':
         input_data = "data/"
         output_data = "out/"
-
-    spark = create_spark_session(mode)
+        spark.sparkContext.addPyFile("spark-dependencies.zip")
 
     # process_catalog(spark, input_data, output_data)
-    process_data(spark, input_data, output_data)
+    process_data(spark, input_data, output_data, mode)
 
 
 if __name__ == "__main__":

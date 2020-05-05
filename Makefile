@@ -12,6 +12,7 @@ requirements:
 install: venv requirements
 	export AIRFLOW_HOME=./airflow;  \
 	export AIRFLOW__CORE__FERNET_KEY=$(cat fernet.key); \
+	export PYTHONPATH=$PYTHONPATH:$(pwd); \
 	source venv/bin/activate; airflow initdb
 
 spark-dep:

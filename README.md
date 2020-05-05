@@ -101,7 +101,7 @@ Finally, to run spark in local mode:
 
 `make spark`
 
-This will invoke `lib/spark-etl.py` which contains the code to generate the final dataset.
+This will invoke `lib/spark-etl.py` which contains the code to generate the final dataset. Note that for local dev, a smaller catalog will be used `catalog_mini.csv` which consits of 20 book titles.
 
 
 ## Airflow Pipeline
