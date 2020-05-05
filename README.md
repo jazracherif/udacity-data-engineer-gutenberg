@@ -14,7 +14,7 @@
 
 Developed originally to evaluate the reading difficulty of technical material for the Navy, the [Flesch–Kincaid readability tests](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests) have since been used widely on all sorts of text, including the reading levels of books. One of their main use in education circles is to enable teachers to find and recommend books based on their difficulty, as measured by these scores.
 
-In this project, I create an ETL pipeline that compute such socres on all english books in the [Gutenberg](www.gutenberg.org) archive. The ETL is orchestrated via Airflow and invokes AWS EMR to run the calculations in a distributed fashion. With this approach, over 22k books (\~8GB) have been ingested.
+In this project, I create an ETL pipeline that compute such socres on all english books in the [Gutenberg](www.gutenberg.org) archive. The ETL is orchestrated via Airflow and invokes AWS EMR to run the calculations in a distributed fashion. With this approach, over 26k books (\~8GB) have been processed.
 
 For every text, the number of sentences, words, and syllables are counted up in order to compute the two final scores:
 - [Flesch–Kincaid grade level](https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch–Kincaid_grade_level) 
@@ -58,18 +58,13 @@ There is a number of challenges identified with the Gutenberg source of data
 - The content of these text files includes Gutenberg specic language and the beginning and the end which interferes with the scores calculation. Detecting such boundary is not fullproof
 
 
-### Number of syllables
-Use the Liang algorithm as defined in http://www.tug.org/docs/liang/liang-thesis.pdf
-and implemented in [hypenate](https://github.com/jfinkels/hyphenate)
-
-
 ## Installation
 
 ### Prerequisits
 
 the AWS credential with read/write control for S3 and EMR must be avilable and store in the `cfg/aws.cfg` file
 
-## Setup
+### Setup
 
 To install the python virtual environment:
 
@@ -145,12 +140,19 @@ The final resutls can be visualized by a query:
 ![athena-query][athena-query]
 
 
+The Airflow DAG took about 75min to run and scores for over *16k* books have been computed:
+- 50,029,777 sentences were scanned
+- 1,095,843,417 words were scanned
+- 1,555,430,845 syllables counted
+
 ## Performance
 
 Some considerations regarding performance:
 - The generation of the catalog.csv file currently takes time because each file is the RDF format.
 - The initial upload of the texts files to S3 will take time. This is because S3 is optimized for a small number of large files rather than a large number of small files.
-- The computation in Spark 
+- The computation of scores in Spark was done via regex for detecting sentences and the [hypenate](https://github.com/jfinkels/hyphenate) module to detect syllabels, which implements the Lian Algorithm as defined in http://www.tug.org/docs/liang/liang-thesis.pdf.
+
+A total
 
 See for example the GANTT chart for the Airflow Task runtime which showcase where the bulk of the computation happens:
 
