@@ -32,6 +32,8 @@ S3_BUCKET = "jazra-gutenberg"
 def get_book_url(g, id):
     """ Get the URL link for the book in the FILE_TYPE format
     """
+    url = None
+
     subject = URIRef(f"http://www.gutenberg.org/ebooks/{id}")
     fmt = URIRef(f"http://purl.org/dc/terms/hasFormat")
     for s, p, o in g.triples((subject, fmt, None)):
@@ -309,7 +311,6 @@ def argparser():
                                  "upload_catalog",
                                  "download_catalog",
                                  "download_data",
-                                 "test",
                                 ]
                         )
 
@@ -330,8 +331,6 @@ def main():
         upload_data_to_s3()
     elif cmd == "upload_catalog":
         upload_catalog_to_s3()
-    elif cmd == "test":
-        print(get_file_info(7422))
     elif cmd == "download_catalog":
         download_catalog()
     elif cmd == "download_data":

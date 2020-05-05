@@ -56,7 +56,7 @@ generate_catalog_op = PythonOperator(
         task_id='generate_catalog',
         dag=dag,
         python_callable=generate_catalog,
-        op_kwargs={'limit': 10}
+        op_kwargs={'limit': None}
     )
 
 upload_catalog_op = PythonOperator(

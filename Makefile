@@ -9,7 +9,7 @@ requirements:
 	source venv/bin/activate; \
 	pip install -r requirements.txt;
 
-install: venv
+install: venv requirements
 	export AIRFLOW_HOME=./airflow;  \
 	export AIRFLOW__CORE__FERNET_KEY=$(cat fernet.key); \
 	source venv/bin/activate; airflow initdb
